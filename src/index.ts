@@ -16,28 +16,36 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// 1. HARDENED UNIVERSAL MANUAL CORS HEADERS MIDDLEWARE (RUNS BEFORE EVERYTHING)
-app.use((req, res, next) => {
-  const origin = req.headers.origin || '*';
-  res.header('Access-Control-Allow-Origin', origin);
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
-  );
+// 1. Clean & Official CORS Package Configuration (Must execute BEFORE all routes)
+const allowedOrigins = [
+  'https://ujjain-mahakal.vercel.app',
+  'http://localhost:3000',
+  'http://127.0.0.1:3000',
+];
 
-  // Instantly respond 200 OK to browser OPTIONS preflight requests
-  if (req.method === 'OPTIONS') {
-    res.sendStatus(200);
-    return;
-  }
+if (env.CLIENT_URL) {
+  allowedOrigins.push(env.CLIENT_URL);
+}
 
-  next();
-});
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, server-to-server, or Postman)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+        return callback(null, true);
+      }
+      return callback(null, false);
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+    optionsSuccessStatus: 200, // Preflight OPTIONS response 200 OK
+  })
+);
 
-// 2. Additional standard CORS package fallback
-app.use(cors());
+// 2. Explicit Preflight OPTIONS handler for all endpoints
+app.options('*', cors());
 
 // 3. Security Headers
 app.use(
@@ -46,7 +54,7 @@ app.use(
   })
 );
 
-// 4. Body Parsers & Cookie Parser
+// 4. Body & Cookie Parsers
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
@@ -59,10 +67,10 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// 6. Static Files Uploads
+// 6. Static File Uploads
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// 7. Root & Health Test Endpoints
+// 7. Root & Health Endpoints
 app.get('/', (req, res) => {
   res.status(200).json({ success: true, message: 'Mahakal Pandit Express API Server Live' });
 });

@@ -16,32 +16,42 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// CORS Middleware BEFORE all routes & helmet
-app.use(
-  cors({
-    origin: true, // Dynamically allow requesting origin
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
-  })
-);
+// 1. HARDENED UNIVERSAL MANUAL CORS HEADERS MIDDLEWARE (RUNS BEFORE EVERYTHING)
+app.use((req, res, next) => {
+  const origin = req.headers.origin || '*';
+  res.header('Access-Control-Allow-Origin', origin);
+  res.header('Access-Control-Allow-Credentials', 'true');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept, Authorization'
+  );
 
-// Pre-Flight OPTIONS handler for all endpoints
-app.options('*', cors());
+  // Instantly respond 200 OK to browser OPTIONS preflight requests
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+    return;
+  }
 
-// Security Headers
+  next();
+});
+
+// 2. Additional standard CORS package fallback
+app.use(cors());
+
+// 3. Security Headers
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' },
   })
 );
 
-// Body Parsers & Cookie Parser BEFORE routes
+// 4. Body Parsers & Cookie Parser
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
-// Rate Limiting
+// 5. Rate Limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 500,
@@ -49,24 +59,23 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// Static Files Uploads
+// 6. Static Files Uploads
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// Root Endpoint Test
+// 7. Root & Health Test Endpoints
 app.get('/', (req, res) => {
   res.status(200).json({ success: true, message: 'Mahakal Pandit Express API Server Live' });
 });
 
-// API Routes
-app.use('/api/auth', authRoutes);
-app.use('/api', apiRoutes);
-
-// Health Check
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', message: 'Mahakal Pandit Backend Server Running' });
 });
 
-// Error Handling Middleware
+// 8. API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api', apiRoutes);
+
+// 9. Error Handling Middleware
 app.use(errorHandler);
 
 const PORT = env.PORT || 5000;

@@ -16,6 +16,19 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
+// CORS Middleware BEFORE all routes & helmet
+app.use(
+  cors({
+    origin: true, // Dynamically allow requesting origin
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept'],
+  })
+);
+
+// Pre-Flight OPTIONS handler for all endpoints
+app.options('*', cors());
+
 // Security Headers
 app.use(
   helmet({
@@ -23,42 +36,10 @@ app.use(
   })
 );
 
-// Strict Security CORS Configuration
-const allowedOrigins = [
-  'https://ujjain-mahakal.vercel.app',
-  'http://localhost:3000',
-  'http://127.0.0.1:3000',
-];
-
-if (env.CLIENT_URL) {
-  allowedOrigins.push(env.CLIENT_URL);
-}
-
-app.use(
-  cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, Postman or server-to-server)
-      if (!origin) return callback(null, true);
-
-      // Check exact match or any Vercel preview domain
-      const isAllowed =
-        allowedOrigins.includes(origin) ||
-        origin.endsWith('.vercel.app');
-
-      if (isAllowed) {
-        return callback(null, true);
-      } else {
-        return callback(new Error(`CORS Policy: Origin ${origin} not allowed`));
-      }
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  })
-);
-
-// Explicit Pre-Flight Handlers for CORS
-app.options('*', cors());
+// Body Parsers & Cookie Parser BEFORE routes
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(cookieParser());
 
 // Rate Limiting
 const limiter = rateLimit({
@@ -68,13 +49,13 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// Middleware
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(cookieParser());
-
 // Static Files Uploads
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+
+// Root Endpoint Test
+app.get('/', (req, res) => {
+  res.status(200).json({ success: true, message: 'Mahakal Pandit Express API Server Live' });
+});
 
 // API Routes
 app.use('/api/auth', authRoutes);

@@ -1,5 +1,10 @@
 import { Schema, model, Document } from 'mongoose';
 
+export interface IBlogFaq {
+  question: string;
+  answer: string;
+}
+
 export interface IBlog extends Document {
   title: string;
   slug: string;
@@ -10,10 +15,17 @@ export interface IBlog extends Document {
   author: string;
   readTime: string;
   status: 'draft' | 'published' | 'hidden';
+  tags?: string[];
+  faqs?: IBlogFaq[];
   publishedAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
+
+const BlogFaqSchema = new Schema<IBlogFaq>({
+  question: { type: String, required: true },
+  answer: { type: String, required: true },
+});
 
 const blogSchema = new Schema<IBlog>(
   {
@@ -26,6 +38,8 @@ const blogSchema = new Schema<IBlog>(
     author: { type: String, default: 'Mahakal Pandit Editorial' },
     readTime: { type: String, default: '5 min read' },
     status: { type: String, enum: ['draft', 'published', 'hidden'], default: 'published' },
+    tags: [{ type: String }],
+    faqs: [BlogFaqSchema],
     publishedAt: { type: Date, default: Date.now },
   },
   { timestamps: true }

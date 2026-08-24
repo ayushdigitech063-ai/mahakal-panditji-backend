@@ -62,5 +62,7 @@ export const blogSchema = z.object({
   content: z.string().min(20, 'Content is required'),
   author: z.string().optional(),
   readTime: z.string().optional(),
+  tags: z.array(z.string()).optional(),
+  faqs: z.array(z.object({ question: z.string(), answer: z.string() })).optional(),
   status: z.enum(['draft', 'published', 'hidden']).optional(),
 });

@@ -48,6 +48,8 @@ export const poojaSchema = z.object({
   samagri: z.array(z.string()),
   price: z.number().min(0, 'Price must be non-negative'),
   category: z.string().optional(),
+  faqs: z.array(z.object({ question: z.string(), answer: z.string() })).optional(),
+  tags: z.array(z.string()).optional(),
   isActive: z.boolean().optional(),
 });
 

@@ -18,10 +18,22 @@ const storage = new CloudinaryStorage({
       folder = `mahakal_${folderParam}`;
     }
 
+    const isPandit = folderParam === 'pandits';
+
     return {
       folder: folder,
       allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'jfif'],
-      transformation: [{ width: 1200, height: 1200, crop: 'limit', quality: 'auto' }],
+      transformation: isPandit
+        ? [
+            {
+              width: 800,
+              height: 1000,
+              crop: 'fill',
+              gravity: 'face', // Auto Face Detection Crop for Passport/Portrait Style
+              quality: 'auto',
+            },
+          ]
+        : [{ width: 1200, height: 1200, crop: 'limit', quality: 'auto' }],
     };
   },
 });

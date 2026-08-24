@@ -13,5 +13,8 @@ export const env = {
   ADMIN_EMAIL: process.env.ADMIN_EMAIL || 'admin@mahakalpandit.com',
   ADMIN_PASSWORD: process.env.ADMIN_PASSWORD || 'MahakalAdmin2026!',
   UPLOAD_DIR: process.env.UPLOAD_DIR || 'uploads',
-  MAX_FILE_SIZE: parseInt(process.env.MAX_FILE_SIZE || '5242880', 10),
+  MAX_FILE_SIZE: parseInt(process.env.MAX_FILE_SIZE || '10485760', 10), // 10MB
+  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME || 'u4bnc0pb',
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY || '879478582231125',
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET || 'IrMXi3JpZFXPFZpfKjBoGi1oiN0',
 };

@@ -6,21 +6,15 @@ export const handleFileUpload = (req: Request, res: Response): void => {
     return;
   }
 
-  const folder = req.params.folder || 'general';
-  
-  // Return relative path so frontend and backend can construct full URL dynamically using protocol + host or SERVER_ORIGIN
-  const relativeUrl = `/uploads/${folder}/${req.file.filename}`;
-
-  // Full origin URL constructed dynamically from request host header
-  const protocol = req.protocol === 'https' || req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http';
-  const fullUrl = `${protocol}://${req.get('host')}${relativeUrl}`;
+  // Cloudinary returns the full HTTPS URL in req.file.path
+  const fileUrl = (req.file as any).path || (req.file as any).secure_url || `/uploads/${req.params.folder || 'general'}/${req.file.filename}`;
 
   res.status(200).json({
     success: true,
-    message: 'File uploaded successfully',
+    message: 'File uploaded successfully to Cloudinary',
     data: {
-      url: relativeUrl, // Relative path for clean DB storing
-      fullUrl: fullUrl,
+      url: fileUrl, // Permanent HTTPS Cloudinary URL stored directly in Database
+      fullUrl: fileUrl,
       filename: req.file.filename,
       size: req.file.size,
       mimetype: req.file.mimetype,

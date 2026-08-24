@@ -18,6 +18,32 @@ import {
   deletePooja,
 } from '../controllers/poojaController';
 import {
+  getPublicHotels,
+  getPublicHotelBySlug,
+  getAdminHotels,
+  createHotel,
+  updateHotel,
+  toggleHotelStatus,
+  deleteHotel,
+} from '../controllers/hotelController';
+import {
+  getPublicTours,
+  getPublicTourBySlug,
+  getAdminTours,
+  createTour,
+  updateTour,
+  toggleTourStatus,
+  deleteTour,
+} from '../controllers/tourController';
+import {
+  getPublicTravelServices,
+  getAdminTravelServices,
+  createTravelService,
+  updateTravelService,
+  toggleTravelServiceStatus,
+  deleteTravelService,
+} from '../controllers/travelController';
+import {
   getPublicBlogs,
   getPublicBlogBySlug,
   getAdminBlogs,
@@ -70,6 +96,14 @@ router.get('/pandits/:slug', getPublicPanditBySlug);
 router.get('/poojas', getPublicPoojas);
 router.get('/poojas/:slug', getPublicPoojaBySlug);
 
+router.get('/hotels', getPublicHotels);
+router.get('/hotels/:slug', getPublicHotelBySlug);
+
+router.get('/tours', getPublicTours);
+router.get('/tours/:slug', getPublicTourBySlug);
+
+router.get('/travel', getPublicTravelServices);
+
 router.get('/blogs', getPublicBlogs);
 router.get('/blogs/:slug', getPublicBlogBySlug);
 
@@ -104,6 +138,27 @@ router.post('/admin/poojas', createPooja);
 router.put('/admin/poojas/:id', updatePooja);
 router.patch('/admin/poojas/:id/status', togglePoojaStatus);
 router.delete('/admin/poojas/:id', deletePooja);
+
+// Hotels Admin
+router.get('/admin/hotels', getAdminHotels);
+router.post('/admin/hotels', createHotel);
+router.put('/admin/hotels/:id', updateHotel);
+router.patch('/admin/hotels/:id/status', toggleHotelStatus);
+router.delete('/admin/hotels/:id', deleteHotel);
+
+// Tours Admin
+router.get('/admin/tours', getAdminTours);
+router.post('/admin/tours', createTour);
+router.put('/admin/tours/:id', updateTour);
+router.patch('/admin/tours/:id/status', toggleTourStatus);
+router.delete('/admin/tours/:id', deleteTour);
+
+// Travel Admin
+router.get('/admin/travel', getAdminTravelServices);
+router.post('/admin/travel', createTravelService);
+router.put('/admin/travel/:id', updateTravelService);
+router.patch('/admin/travel/:id/status', toggleTravelServiceStatus);
+router.delete('/admin/travel/:id', deleteTravelService);
 
 // Blogs Admin
 router.get('/admin/blogs', getAdminBlogs);

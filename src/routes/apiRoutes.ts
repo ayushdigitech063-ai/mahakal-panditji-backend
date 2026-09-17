@@ -1,5 +1,14 @@
 import { Router } from 'express';
 import {
+  getPublicProducts,
+  getPublicProductBySlug,
+  getAdminProducts,
+  createProduct,
+  updateProduct,
+  toggleProductStatus,
+  deleteProduct,
+} from '../controllers/productController';
+import {
   getPublicPandits,
   getPublicPanditBySlug,
   getAdminPandits,
@@ -107,6 +116,9 @@ router.get('/travel', getPublicTravelServices);
 router.get('/blogs', getPublicBlogs);
 router.get('/blogs/:slug', getPublicBlogBySlug);
 
+router.get('/products', getPublicProducts);
+router.get('/products/:slug', getPublicProductBySlug);
+
 router.get('/reviews', getPublicReviews);
 router.get('/festivals', getPublicFestivals);
 
@@ -138,6 +150,13 @@ router.post('/admin/poojas', createPooja);
 router.put('/admin/poojas/:id', updatePooja);
 router.patch('/admin/poojas/:id/status', togglePoojaStatus);
 router.delete('/admin/poojas/:id', deletePooja);
+
+// Products Admin
+router.get('/admin/products', getAdminProducts);
+router.post('/admin/products', createProduct);
+router.put('/admin/products/:id', updateProduct);
+router.patch('/admin/products/:id/status', toggleProductStatus);
+router.delete('/admin/products/:id', deleteProduct);
 
 // Hotels Admin
 router.get('/admin/hotels', getAdminHotels);
